@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>পকেট ও সংসার ট্র্যাকার</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #090d16;
+            color: #f1f5f9;
+            min-height: 100vh;
+            padding-bottom: 85px;
+            user-select: none;
+        }
+        .header {
+            background: #0f172a;
+            border-bottom: 1px solid #1e293b;
+            padding: 14px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .logo-box {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: linear-gradient(135deg, #10b981, #0d9488);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: bold; color: white;
+        }
+        .header-title { font-size: 15px; font-weight: 700; color: #fff; }
+        .header-sub { font-size: 11px; color: #94a3b8; }
+        .icon-btn {
+            background: #1e293b; border: 1px solid #334155; color: #cbd5e1;
+            padding: 8px 12px; border-radius: 10px; font-size: 13px; cursor: pointer;
+        }
+        .container { max-width: 480px; margin: 0 auto; padding: 14px; }
+        .card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 14px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-box { padding: 11px; border-radius: 12px; }
+        .stat-inc { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .stat-exp { background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.3); }
+        .stat-sav { background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .stat-bal { background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.3); }
+        .stat-label { font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px; }
+        .stat-val { font-size: 18px; font-weight: 800; color: #fff; }
+        .stat-sub { font-size: 10px; color: #94a3b8; margin-top: 3px; }
+        .divider { height: 1px; background: #1e293b; margin: 12px 0; }
+        .limit-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+        .progress-bg { width: 100%; height: 8px; background: #1e293b; border-radius: 99px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #10b981; transition: width 0.3s; }
+        .toggle-box {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+            background: #090d16; padding: 4px; border-radius: 12px; border: 1px solid #1e293b; margin-bottom: 14px;
+        }
+        .toggle-btn {
+            padding: 10px; border: none; border-radius: 9px; font-weight: 700; font-size: 13px;
+            cursor: pointer; background: transparent; color: #94a3b8;
+        }
+        .toggle-exp-active { background: #e11d48; color: #fff; }
+        .toggle-inc-active { background: #059669; color: #fff; }
+        .input-label { font-size: 12px; color: #94a3b8; display: block; margin-bottom: 5px; }
+        .amount-wrap { position: relative; margin-bottom: 8px; }
+        .currency-sym { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 18px; font-weight: bold; color: #94a3b8; }
+        .amount-input {
+            width: 100%; background: #090d16; border: 1px solid #334155; border-radius: 12px;
+            padding: 12px 50px 12px 32px; font-size: 20px; font-weight: 700; color: #fff; outline: none;
+        }
+        .clear-btn {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            background: #1e293b; border: none; color: #94a3b8; padding: 4px 8px; border-radius: 6px; font-size: 11px;
+        }
+        .quick-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+        .quick-btn {
+            background: #1e293b; border: 1px solid #334155; color: #e2e8f0;
+            padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;
+        }
+        .cat-btn {
+            padding: 10px; border-radius: 10px; border: 1px solid #1e293b; background: #090d16;
+            color: #94a3b8; font-size: 12px; font-weight: 600; text-align: left; cursor: pointer;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .cat-active { background: #1e293b; border-color: #10b981; color: #fff; }
+        .row-inputs { display: grid; grid-template-columns: 1.6fr 1fr; gap: 8px; margin: 14px 0; }
+        .text-input {
+            width: 100%; background: #090d16; border: 1px solid #334155; border-radius: 10px;
+            padding: 10px; font-size: 13px; color: #fff; outline: none;
+        }
+        .submit-btn {
+            width: 100%; padding: 13px; border: none; border-radius: 12px;
+            font-size: 14px; font-weight: 700; color: #fff; cursor: pointer;
+        }
+        .tx-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; background: #090d16; border: 1px solid #1e293b;
+            border-radius: 10px; margin-bottom: 8px;
+        }
+        .tx-title { font-size: 13px; font-weight: 700; color: #e2e8f0; }
+        .tx-sub { font-size: 11px; color: #64748b; margin-top: 2px; }
+        .tx-right { display: flex; align-items: center; gap: 10px; }
+        .del-btn { background: none; border: none; color: #64748b; font-size: 14px; cursor: pointer; padding: 4px; }
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; background: #0f172a;
+            border-top: 1px solid #1e293b; padding: 6px 12px; z-index: 40;
+        }
+        .nav-inner { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .nav-btn {
+            padding: 8px; border-radius: 10px; border: none; background: transparent;
+            color: #64748b; font-size: 12px; font-weight: 700; cursor: pointer;
+        }
+        .nav-active { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            z-index: 50; align-items: center; justify-content: center; padding: 16px;
+        }
+        .modal-box { background: #0f172a; border: 1px solid #334155; border-radius: 16px; max-width: 360px; width: 100%; padding: 18px; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-box">৳</div>
+            <div>
+                <div class="header-title">পকেট ও সংসার ট্র্যাকার</div>
+                <div class="header-sub">সম্পূর্ণ অফলাইন অ্যাপ • অটো সেভ</div>
+            </div>
+        </div>
+        <button class="icon-btn" onclick="openSettings()">⚙️ সেটিংস</button>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="grid-2">
+                <div class="stat-box stat-inc">
+                    <span class="stat-label" style="color:#6ee7b7">▲ মোট ইনকাম</span>
+                    <div id="totalIncome" class="stat-val">৳0</div>
+                </div>
+                <div class="stat-box stat-exp">
+                    <span class="stat-label" style="color:#fda4af">▼ মোট খরচ</span>
+                    <div id="totalExpense" class="stat-val">৳0</div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="grid-2">
+                <div class="stat-box stat-sav">
+                    <span class="stat-label" style="color:#fcd34d">🔒 <span id="savPctLabel">30</span>% সেভিংস ভল্ট</span>
+                    <div id="savingsTarget" class="stat-val" style="color:#fbbf24">৳0</div>
+                    <div class="stat-sub">আলাদা অ্যাকাউন্টে রাখবি</div>
+                </div>
+                <div class="stat-box stat-bal">
+                    <span class="stat-label" style="color:#a5b4fc">💳 খরচযোগ্য ব্যালেন্স</span>
+                    <div id="spendableBalance" class="stat-val" style="color:#818cf8">৳0</div>
+                    <div id="netBalanceText" class="stat-sub">মোট হাতে আছে: ৳0</div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div>
+                <div class="limit-row">
+                    <span style="color:#cbd5e1">আজকের খরচ: <strong id="todayExpense" style="color:#fff">৳0</strong> / ৳<span id="limitLabel">350</span></span>
+                    <span id="limitStatus" style="color:#34d399; font-weight:700">লিমিটের মধ্যে আছে</span>
+                </div>
+                <div class="progress-bg">
+                    <div id="limitBar" class="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tabAdd">
+            <div class="card">
+                <div class="toggle-box">
+                    <button id="btnTypeExpense" class="toggle-btn toggle-exp-active" onclick="setType('expense')">- খরচ (Expense)</button>
+                    <button id="btnTypeIncome" class="toggle-btn" onclick="setType('income')">+ ইনকাম (Income)</button>
+                </div>
+
+                <label class="input-label">টাকার পরিমাণ (৳)</label>
+                <div class="amount-wrap">
+                    <span class="currency-sym">৳</span>
+                    <input type="number" id="amountInput" class="amount-input" placeholder="0" inputmode="numeric">
+                    <button class="clear-btn" onclick="document.getElementById('amountInput').value=''">মুছুন</button>
+                </div>
+
+                <div class="quick-wrap">
+                    <button class="quick-btn" onclick="addQuickAmount(20)">+৳20</button>
+                    <button class="quick-btn" onclick="addQuickAmount(50)">+৳50</button>
+                    <button class="quick-btn" onclick="addQuickAmount(100)">+৳100</button>
+                    <button class="quick-btn" onclick="addQuickAmount(200)">+৳200</button>
+                    <button class="quick-btn" onclick="addQuickAmount(500)">+৳500</button>
+                </div>
+
+                <label class="input-label">ক্যাটাগরি সিলেক্ট কর</label>
+                <div id="categoryGrid" class="grid-2"></div>
+
+                <div class="row-inputs">
+                    <input type="text" id="noteInput" class="text-input" placeholder="নোট (যেমন: রিকশা, খাবার...)">
+                    <input type="date" id="dateInput" class="text-input">
+                </div>
+
+                <button id="submitBtn" class="submit-btn" style="background:#e11d48" onclick="saveTransaction()">খরচ সেভ কর</button>
+            </div>
+
+            <div class="card">
+                <div style="font-size:14px; font-weight:700; margin-bottom:10px;">সাম্প্রতিক হিসাব</div>
+                <div id="recentList"></div>
+            </div>
+        </div>
+
+        <div id="tabHistory" class="card hidden">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <span style="font-size:14px; font-weight:700;">সব লেনদেনের রেকর্ড</span>
+                <button class="icon-btn" onclick="exportBackup()">⬇ ব্যাকআপ</button>
+            </div>
+            <div id="fullHistoryList"></div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal">
+        <div class="modal-box">
+            <div style="font-size:16px; font-weight:700; margin-bottom:14px;">বাজেট ও সেভিংস সেটিংস</div>
+            <div style="margin-bottom:12px;">
+                <label class="input-label">ডেইলি খরচের লিমিট (৳)</label>
+                <input type="number" id="setLimitInput" class="text-input">
+            </div>
+            <div style="margin-bottom:16px;">
+                <label class="input-label">গোপন সেভিংস টার্গেট (%)</label>
+                <input type="number" id="setSavingsInput" class="text-input">
+            </div>
+            <div class="grid-2">
+                <button class="icon-btn" onclick="closeSettings()">বাতিল</button>
+                <button class="icon-btn" style="background:#059669; color:#fff; border:none; font-weight:700;" onclick="saveSettings()">সেভ কর</button>
+            </div>
+            <div style="text-align:center; margin-top:14px; padding-top:10px; border-top:1px solid #1e293b;">
+                <button onclick="clearAllData()" style="background:none; border:none; color:#fb7185; font-size:12px; cursor:pointer;">সব হিসাব রিসেট কর</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-inner">
+            <button id="navAdd" class="nav-btn nav-active" onclick="switchTab('add')">➕ হিসাব এন্ট্রি</button>
+            <button id="navHistory" class="nav-btn" onclick="switchTab('history')">📋 সব রেকর্ড</button>
+        </div>
+    </div>
+
+    <script>
+        const EXPENSE_CATS = [
+            { id: 'food', label: '🍽️ খাবার ও নাস্তা' },
+            { id: 'transport', label: '🚌 রিকশা ও যাতায়াত' },
+            { id: 'uni', label: '🎓 ভার্সিটি (CSE)' },
+            { id: 'home', label: '🏠 বাড়ি (আম্মু ও বউ)' },
+            { id: 'rent', label: '🏢 ঢাকায় মেস/বিল' },
+            { id: 'other', label: '🛍️ অন্যান্য খরচ' }
+        ];
+
+        const INCOME_CATS = [
+            { id: 'parttime', label: '💼 পার্ট-টাইম জব' },
+            { id: 'freelance', label: '💻 ওয়েব/ফ্রিল্যান্সিং' },
+            { id: 'other_in', label: '🪙 অন্যান্য আয়' }
+        ];
+
+        let currentType = 'expense';
+        let selectedCategory = 'food';
+        let transactions = JSON.parse(localStorage.getItem('jihad_tx_v1') || '[]');
+        let settings = JSON.parse(localStorage.getItem('jihad_settings_v1') || '{"dailyLimit": 350, "savingsPercent": 30}');
+
+        document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+
+        function setType(type) {
+            currentType = type;
+            selectedCategory = type === 'expense' ? 'food' : 'parttime';
+            const btnExp = document.getElementById('btnTypeExpense');
+            const btnInc = document.getElementById('btnTypeIncome');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (type === 'expense') {
+                btnExp.className = 'toggle-btn toggle-exp-active';
+                btnInc.className = 'toggle-btn';
+                submitBtn.style.background = '#e11d48';
+                submitBtn.innerText = 'খরচ সেভ কর';
+            } else {
+                btnInc.className = 'toggle-btn toggle-inc-active';
+                btnExp.className = 'toggle-btn';
+                submitBtn.style.background = '#059669';
+                submitBtn.innerText = 'ইনকাম সেভ কর';
+            }
+            renderCategories();
+        }
+
+        function renderCategories() {
+            const cats = currentType === 'expense' ? EXPENSE_CATS : INCOME_CATS;
+            const grid = document.getElementById('categoryGrid');
+            grid.innerHTML = cats.map(c => `
+                <button onclick="selectCat('${c.id}')" class="cat-btn ${selectedCategory === c.id ? 'cat-active' : ''}">
+                    <span>${c.label}</span>
+                </button>
+            `).join('');
+        }
+
+        function selectCat(id) {
+            selectedCategory = id;
+            renderCategories();
+        }
+
+        function addQuickAmount(val) {
+            const input = document.getElementById('amountInput');
+            input.value = (Number(input.value) || 0) + val;
+        }
+
+        function saveTransaction() {
+            const amt = Number(document.getElementById('amountInput').value);
+            if (!amt || amt <= 0) { alert('টাকার পরিমাণ দে!'); return; }
+
+            const note = document.getElementById('noteInput').value.trim();
+            const date = document.getElementById('dateInput').value;
+
+            transactions.unshift({
+                id: Date.now(),
+                type: currentType,
+                amount: amt,
+                category: selectedCategory,
+                note: note,
+                date: date
+            });
+
+            localStorage.setItem('jihad_tx_v1', JSON.stringify(transactions));
+            document.getElementById('amountInput').value = '';
+            document.getElementById('noteInput').value = '';
+            updateUI();
+        }
+
+        function deleteTx(id) {
+            if(!confirm('এই হিসাবটি মুছে ফেলতে চাস?')) return;
+            transactions = transactions.filter(t => t.id !== id);
+            localStorage.setItem('jihad_tx_v1', JSON.stringify(transactions));
+            updateUI();
+        }
+
+        function getCatLabel(id) {
+            const all = [...EXPENSE_CATS, ...INCOME_CATS];
+            const found = all.find(c => c.id === id);
+            return found ? found.label : id;
+        }
+
+        function updateUI() {
+            let totalInc = 0, totalExp = 0, todayExp = 0;
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            transactions.forEach(t => {
+                if (t.type === 'income') totalInc += t.amount;
+                else {
+                    totalExp += t.amount;
+                    if (t.date === todayStr) todayExp += t.amount;
+                }
+            });
+
+            const netBal = totalInc - totalExp;
+            const savVault = Math.round((totalInc * settings.savingsPercent) / 100);
+            const spendable = netBal - savVault;
+
+            document.getElementById('totalIncome').innerText = '৳' + totalInc.toLocaleString('en-IN');
+            document.getElementById('totalExpense').innerText = '৳' + totalExp.toLocaleString('en-IN');
+            document.getElementById('savPctLabel').innerText = settings.savingsPercent;
+            document.getElementById('savingsTarget').innerText = '৳' + savVault.toLocaleString('en-IN');
+            document.getElementById('spendableBalance').innerText = '৳' + spendable.toLocaleString('en-IN');
+            document.getElementById('netBalanceText').innerText = 'মোট হাতে আছে: ৳' + netBal.toLocaleString('en-IN');
+
+            document.getElementById('todayExpense').innerText = '৳' + todayExp;
+            document.getElementById('limitLabel').innerText = settings.dailyLimit;
+            const pct = Math.min(100, Math.round((todayExp / settings.dailyLimit) * 100));
+            const bar = document.getElementById('limitBar');
+            const status = document.getElementById('limitStatus');
+            bar.style.width = pct + '%';
+
+            if (todayExp > settings.dailyLimit) {
+                bar.style.background = '#f43f5e';
+                status.style.color = '#fb7185';
+                status.innerText = 'লিমিট ক্রস করেছে!';
+            } else {
+                bar.style.background = '#10b981';
+                status.style.color = '#34d399';
+                status.innerText = 'আর ৳' + (settings.dailyLimit - todayExp) + ' বাকি';
+            }
+
+            const renderItem = (t) => `
+                <div class="tx-item">
+                    <div>
+                        <div class="tx-title">${getCatLabel(t.category)}</div>
+                        <div class="tx-sub">${t.note ? t.note + ' • ' : ''}${t.date}</div>
+                    </div>
+                    <div class="tx-right">
+                        <span style="font-size:14px; font-weight:700; color:${t.type === 'income' ? '#34d399' : '#fb7185'}">
+                            ${t.type === 'income' ? '+' : '-'}৳${t.amount}
+                        </span>
+                        <button class="del-btn" onclick="deleteTx(${t.id})">🗑️</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('recentList').innerHTML = transactions.slice(0, 5).map(renderItem).join('') || '<div style="font-size:12px; color:#64748b; text-align:center; padding:12px;">এখনো কোনো হিসাব যোগ করা হয়নি</div>';
+            document.getElementById('fullHistoryList').innerHTML = transactions.map(renderItem).join('') || '<div style="font-size:12px; color:#64748b; text-align:center; padding:12px;">কোনো রেকর্ড নেই</div>';
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tabAdd').classList.toggle('hidden', tab !== 'add');
+            document.getElementById('tabHistory').classList.toggle('hidden', tab !== 'history');
+            document.getElementById('navAdd').className = tab === 'add' ? 'nav-btn nav-active' : 'nav-btn';
+            document.getElementById('navHistory').className = tab === 'history' ? 'nav-btn nav-active' : 'nav-btn';
+        }
+
+        function openSettings() {
+            document.getElementById('setLimitInput').value = settings.dailyLimit;
+            document.getElementById('setSavingsInput').value = settings.savingsPercent;
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function saveSettings() {
+            settings.dailyLimit = Number(document.getElementById('setLimitInput').value) || 350;
+            settings.savingsPercent = Number(document.getElementById('setSavingsInput').value) || 30;
+            localStorage.setItem('jihad_settings_v1', JSON.stringify(settings));
+            closeSettings();
+            updateUI();
+        }
+
+        function clearAllData() {
+            if (confirm('সত্যিই সব হিসাব মুছে ফেলবি?')) {
+                transactions = [];
+                localStorage.removeItem('jihad_tx_v1');
+                closeSettings();
+                updateUI();
+            }
+        }
+
+        function exportBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(transactions, null, 2));
+            const a = document.createElement('a');
+            a.href = dataStr;
+            a.download = "hisab_backup.json";
+            a.click();
+        }
+
+        renderCategories();
+        updateUI();
+    </script>
+</body>
+</html>
